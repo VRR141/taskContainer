@@ -1,63 +1,18 @@
 package ru.netology.repository;
 
-import ru.netology.exception.IncorrectIdException;
-import ru.netology.exception.NotFoundException;
 import ru.netology.model.Post;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Optional;
 
-// Stub
-public class PostRepository {
+public interface PostRepository {
 
-  private ConcurrentHashMap<Long, Post> storage;
+    List<Post> all();
 
-  private AtomicLong aLong;
+    Optional<Post> getById(long id);
 
-  public PostRepository() {
-    storage = new ConcurrentHashMap<>();
-    aLong = new AtomicLong(1);
-  }
+    Post save(Post post);
 
-  public List<Post> all() {
-    Collection<Post> posts = storage.values();
-    List<Post> result = posts.stream().collect(Collectors.toList());
-    return result;
-  }
+    void removeById(long id);
 
-  public Optional<Post> getById(long id) {
-    return Optional.ofNullable(storage.get(id));
-  }
-
-  public Post save(Post post) {
-    long id = post.getId();
-    if (id < 0){
-      throw new IncorrectIdException("id must be positive or 0");
-    }
-    if (id == 0){
-      createNewPost(post);
-      return post;
-    }
-    Post temp = storage.get(id);
-    if (temp == null){
-      throw new NotFoundException("post is null, can't update");
-    }
-    storage.put(id, post);
-    return post;
-  }
-
-  public void removeById(long id) {
-    if (storage.containsKey(id)) {
-      storage.remove(id);
-      return;
-    }
-    throw new NotFoundException();
-  }
-
-  private void createNewPost(Post post){
-    storage.put(aLong.get(), post);
-    aLong.getAndIncrement();
-  }
 }
